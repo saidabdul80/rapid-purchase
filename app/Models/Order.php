@@ -14,6 +14,7 @@ class Order extends Model
         'quantity',
         'unit_price',
         'date_needed',
+        'phone_number'
     ];
 
     public function product(){

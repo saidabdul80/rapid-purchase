@@ -98,12 +98,15 @@ class OrderController extends Controller
             }elseif ($sessionData["date"]  === "") {
                   // Extract the product ID and quantity from the user input                                                                           
                 $product = Product::where('id', $sessionData['product_id'])->with('user')->first();
+                $customer = User::where('phone_number', $phoneNumber)->first();
+                
                 $order = Order::create([
-                    'user_id' => $product->user->id,
+                    'user_id' => $customer?->id,
                     'product_id' => $sessionData["product_id"],
                     'quantity' => $sessionData["quantity"],
                     'unit_price' => $product->price * $sessionData["quantity"],
-                    'date_needed' => $sessionData["date"]
+                    'date_needed' => $sessionData["date"],
+                    "phone_number" => $phoneNumber,
                 ]);
                     // Send email to the product user                                
                 Mail::to($product->user->email)->send(new OrderMadeEmail($order));
