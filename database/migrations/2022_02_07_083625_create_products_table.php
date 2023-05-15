@@ -1,36 +1,27 @@
 <?php
-
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateCountriesTable extends Migration
+class CreateProductsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
-    {        
-            Schema::create('countries', function (Blueprint $table) {
-                $table->id('id');                
-                $table->string('short_name');
-                $table->string('name');
-                $table->integer('phone_code');
-                $table->timestamps();
-            });        
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->float('price', 8, 2);
+            $table->integer("user_id");
+            $table->string("description")->nullable();
+            $table->integer("quantity");
+            $table->integer("active")->default(0);
+            // Add any other necessary columns for product details
+            $table->timestamps();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::disableForeignKeyConstraints();        
-        Schema::dropIfExists('countries');
-        Schema::enableForeignKeyConstraints();
+        Schema::dropIfExists('products');
     }
 }

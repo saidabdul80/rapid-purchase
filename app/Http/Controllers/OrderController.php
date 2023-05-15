@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
@@ -35,19 +36,14 @@ class OrderController extends Controller
 
     public function store(Request $request)
 {
-    try {
-        $input = $request->all();
-
+    try {        
         // Validate the USSD request input
-        $validator = Validator::make($input, [
+        $request->validate([
             'session_id' => 'required',
             'phone_number' => 'required',
             'user_input' => 'required',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => 'Invalid USSD request'], 400);
-        }
+       
         $sessionId = $request->input('sessionId');
         $serviceCode = $request->input('serviceCode');
         $phoneNumber = $request->input('phoneNumber');
@@ -124,9 +120,11 @@ class OrderController extends Controller
         return response($ussdResponse)->header('Content-Type', 'text/plain');
     
       
+    } catch (ValidationException $e) {
+        return response('Failed to process USSD request, Invlid fields')->header('Content-Type', 'text/plain');        
     } catch (\Exception $e) {
         Log::error($e->getMessage());
-        response('Failed to process USSD request')->header('Content-Type', 'text/plain');        
+        return response('Failed to process USSD request')->header('Content-Type', 'text/plain');        
     }
 }
 
