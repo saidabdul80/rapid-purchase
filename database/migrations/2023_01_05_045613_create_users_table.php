@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('other_name')->nullable();
             $table->string('last_name');
             $table->string('email');        
+            $table->string('ussd');        
             $table->string('phone_number')->unique();
             $table->string('address');
             $table->enum('user_type', ['owner','customer', 'user'])->default('user');

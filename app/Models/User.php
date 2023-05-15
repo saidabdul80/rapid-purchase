@@ -28,6 +28,7 @@ class User extends Authenticatable
         'phone_number',
         'address',
         'user_type',
+        "ussd",
     ];
 
     /**
