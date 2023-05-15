@@ -38,11 +38,11 @@ class OrderController extends Controller
 {
     try {        
         // Validate the USSD request input
-        $request->validate([
-            'session_id' => 'required',
+   /*      $request->validate([
+            'sessionId' => 'required',
             'phone_number' => 'required',
             'user_input' => 'required',
-        ]);
+        ]); */
        
         $sessionId = $request->input('sessionId');
         $serviceCode = $request->input('serviceCode');
