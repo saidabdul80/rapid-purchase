@@ -132,6 +132,9 @@ class OrderController extends Controller
                     'date_needed' => $deliveryDate,
                     "phone_number" => $phoneNumber,
                 ]);
+                $order = Order::with('product.user')->where('id',$order->id)->first();
+                // Send email to the product user
+                $product = $order->product;
                     // Send email to the product user                                
                 Mail::to($product->user->email)->send(new OrderMadeEmail($order));
                 $ussdResponse = "END Order Completed.";
