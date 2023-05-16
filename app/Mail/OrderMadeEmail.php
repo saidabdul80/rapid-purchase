@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -18,9 +19,10 @@ class OrderMadeEmail extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    protected $order;
+    public function __construct(Order $order)
     {
-        //
+        $this->order = $order;
     }
 
     /**

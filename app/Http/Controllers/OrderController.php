@@ -168,7 +168,7 @@ class OrderController extends Controller
             ]);
     
             $order = Order::create($validatedData);
-    
+            $order = Order::with('product.user')->where('id',$order->id)->first();
             // Send email to the product user
             $productUser = $order->product->user;
             Mail::to($productUser->email)->send(new OrderMadeEmail($order));
