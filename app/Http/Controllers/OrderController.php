@@ -127,7 +127,7 @@ class OrderController extends Controller
         return 'CON Failed to process USSD request, Invlid fields /n';        
     } catch (\Exception $e) {
         Log::error($e->getMessage());
-        return 'CON Failed to process USSD request /n';
+        return "CON ".$e->getMessage()." \n";
     }
 }
 
