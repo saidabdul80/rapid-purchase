@@ -173,7 +173,7 @@ class OrderController extends Controller
             $productUser = $order->product->user;
             Mail::to($productUser->email)->send(new OrderMadeEmail($order));
     
-            return response()->json($order, 201);
+            return "END Thank you, we will get back to you";
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to create order'], 500);
         }
