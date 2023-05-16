@@ -8,8 +8,10 @@ use App\Models\Product;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+
 use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
@@ -26,11 +28,11 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        try {
+        try {            
             $order = Order::findOrFail($id);
             return response()->json($order);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Order not found'], 404);
+            return response()->json(['error' => $e->getMessage()], 404);
         }
     }
 
@@ -57,14 +59,13 @@ class OrderController extends Controller
         $ussdResponse = '';
 
         // Check the text input to determine the USSD logic
-        $sessionKey = 'ussd_session_' . $phoneNumber;
-        throw new \Exception(json_encode($sessionKey));
-        if(!session()->has($sessionKey) && $text === ''){
-            $sessionData = session([$sessionKey=> [
+        $cacheKey = $sessionId;        
+        if(!Cache::has($cacheKey) && $text === ''){
+            $sessionData = Cache::put($cacheKey, [
                 "product_id"=>0,
                 "quantity"=>0,
-                "date"=>""
-            ]]);
+                "date"=>0
+            ],240);            
             // Initial menu
             $user = User::where('ussd',$serviceCode)->with('products')->first();
     
@@ -76,8 +77,8 @@ class OrderController extends Controller
                 $ussdResponse .= "$index. $product->name \n";
             }                        
         }else{
-            $sessionData = session($sessionKey);
-            throw new \Exception(json_encode($sessionData));
+            $sessionData = Cache::get($cacheKey);
+            
             if ($sessionData["product_id"] == 0) {
                 
                 $index = intval($text)-1;
@@ -85,30 +86,30 @@ class OrderController extends Controller
                 $user = User::where('ussd',$serviceCode)->with('products')->first();
                 $product = $user->products[$index];
             
-                $ussdResponse = "CON Enter quantity of $product?->name !\n";                 
-                session([$sessionKey=> [
-                    "product_id" => $product->id,
-                    "quantity"=>0,
-                    "date"=>""
-                ]]);
+                $ussdResponse = "CON Enter quantity of $product?->name !\n"; 
+                Cache::put($cacheKey, [
+                        "product_id" => $product->id,
+                        "quantity"=>0,
+                        "date"=>0
+                    ], 120);                                
             }elseif ($sessionData["quantity"] == 0) {
-
-                
+                $text = explode('*',$text)[1];
                 $ussdResponse = "CON Please select date to deliver !\n";
                 $ussdResponse .= "1. Today !\n";
                 $ussdResponse .= "2. Tomorrwo !\n";
                 $ussdResponse .= "3. Next Tomorrow !\n";
                 $ussdResponse .= "4. Next 2 Days !\n";
                 $ussdResponse .= "5. Next 3 Days !\n";
-                session([$sessionKey=> [
-                    "product_id" => $sessionData['product_id'],
-                    "quantity"=>$text,
-                    "date"=>""
-                ]]);
-            }elseif ($sessionData["date"]  === "") {
-                  // Extract the product ID and quantity from the user input                                                                           
+                Cache::put($cacheKey,[
+                        "product_id" => $sessionData["product_id"],
+                        "quantity"=>intval($text),
+                        "date"=>0
+                    ],120);             
+            }elseif ($sessionData["date"]  == 0) {
+                  // Extract the product ID and quantity from the user input                                                        
                 $product = Product::where('id', $sessionData['product_id'])->with('user')->first();
                 $customer = User::where('phone_number', $phoneNumber)->first();
+                $text = explode('*',$text)[2];
                 if ($text == '1') {
                     $deliveryDate = Carbon::today();
                 } elseif ($text == '2') {
@@ -127,7 +128,7 @@ class OrderController extends Controller
                     'user_id' => $customer?->id,
                     'product_id' => $sessionData["product_id"],
                     'quantity' => $sessionData["quantity"],
-                    'unit_price' => $product->price * $sessionData["quantity"],
+                    'unit_price' => $product->price,
                     'date_needed' => $deliveryDate,
                     "phone_number" => $phoneNumber,
                 ]);
