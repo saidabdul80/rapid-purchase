@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Product;
 use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
@@ -14,9 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
         $this->call([           
-            CountryTableSeeder::class,
-            StateTableSeeder::class,
-            LGATableSeeder::class,           
+            ProductSeeder::class,        
             UserSeeder::class
         ]);
     }
