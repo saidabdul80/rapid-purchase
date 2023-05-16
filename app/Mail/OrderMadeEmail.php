@@ -19,7 +19,7 @@ class OrderMadeEmail extends Mailable
      *
      * @return void
      */
-    protected $order;
+    public $order;
     public function __construct(Order $order)
     {
         $this->order = $order;
