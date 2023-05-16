@@ -120,14 +120,14 @@ class OrderController extends Controller
 
         // Implement the logic to handle USSD input and generate the appropriate response
      
-        return response($ussdResponse)->header('Content-Type', 'text/plain');
+        return $ussdResponse;
     
       
     } catch (ValidationException $e) {
-        return response('CON Failed to process USSD request, Invlid fields')->header('Content-Type', 'text/plain');        
+        return 'CON Failed to process USSD request, Invlid fields /n';        
     } catch (\Exception $e) {
         Log::error($e->getMessage());
-        return response('CON Failed to process USSD request')->header('Content-Type', 'text/plain');        
+        return 'CON Failed to process USSD request /n';
     }
 }
 
