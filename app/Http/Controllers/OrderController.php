@@ -58,12 +58,13 @@ class OrderController extends Controller
 
         // Check the text input to determine the USSD logic
         $sessionKey = 'ussd_session_' . $phoneNumber;
+        throw new \Exception(json_encode($sessionKey));
         if(!session()->has($sessionKey) && $text === ''){
-            $sessionData = session($sessionKey, [
+            $sessionData = session([$sessionKey=> [
                 "product_id"=>0,
                 "quantity"=>0,
                 "date"=>""
-            ]);
+            ]]);
             // Initial menu
             $user = User::where('ussd',$serviceCode)->with('products')->first();
     
@@ -76,36 +77,58 @@ class OrderController extends Controller
             }                        
         }else{
             $sessionData = session($sessionKey);
+            throw new \Exception(json_encode($sessionData));
             if ($sessionData["product_id"] == 0) {
                 
                 $index = intval($text)-1;
+                
                 $user = User::where('ussd',$serviceCode)->with('products')->first();
                 $product = $user->products[$index];
-                $sessionData["product_id"] = $product->id;
+            
                 $ussdResponse = "CON Enter quantity of $product?->name !\n";                 
-                session($sessionKey, $sessionData);                
+                session([$sessionKey=> [
+                    "product_id" => $product->id,
+                    "quantity"=>0,
+                    "date"=>""
+                ]]);
             }elseif ($sessionData["quantity"] == 0) {
 
-                $sessionData["quantity"]  = $text;
-                session($sessionKey, $sessionData);
+                
                 $ussdResponse = "CON Please select date to deliver !\n";
                 $ussdResponse .= "1. Today !\n";
                 $ussdResponse .= "2. Tomorrwo !\n";
                 $ussdResponse .= "3. Next Tomorrow !\n";
                 $ussdResponse .= "4. Next 2 Days !\n";
                 $ussdResponse .= "5. Next 3 Days !\n";
-
+                session([$sessionKey=> [
+                    "product_id" => $sessionData['product_id'],
+                    "quantity"=>$text,
+                    "date"=>""
+                ]]);
             }elseif ($sessionData["date"]  === "") {
                   // Extract the product ID and quantity from the user input                                                                           
                 $product = Product::where('id', $sessionData['product_id'])->with('user')->first();
                 $customer = User::where('phone_number', $phoneNumber)->first();
-                
+                if ($text == '1') {
+                    $deliveryDate = Carbon::today();
+                } elseif ($text == '2') {
+                    $deliveryDate = Carbon::tomorrow();
+                } elseif ($text == '3') {
+                    $deliveryDate = Carbon::tomorrow()->addDay();
+                } elseif ($text == '4') {
+                    $deliveryDate = Carbon::tomorrow()->addDays(2);
+                } elseif ($text == '5') {
+                    $deliveryDate = Carbon::tomorrow()->addDays(3);
+                } else {
+                    // Invalid input
+                    // Handle the error case accordingly
+                }
                 $order = Order::create([
                     'user_id' => $customer?->id,
                     'product_id' => $sessionData["product_id"],
                     'quantity' => $sessionData["quantity"],
                     'unit_price' => $product->price * $sessionData["quantity"],
-                    'date_needed' => $sessionData["date"],
+                    'date_needed' => $deliveryDate,
                     "phone_number" => $phoneNumber,
                 ]);
                     // Send email to the product user                                
