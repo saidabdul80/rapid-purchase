@@ -73,7 +73,7 @@ class OrderController extends Controller
             $index = 0;
             foreach($user->products as $product){
                 $index++;
-                $ussdResponse .= "$index. $product->name .\"\n";
+                $ussdResponse .= "$index. $product->name \n";
             }                        
         }else{
             $sessionData = session($sessionKey);
