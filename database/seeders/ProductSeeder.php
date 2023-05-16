@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,14 +16,12 @@ class ProductSeeder extends Seeder
      */
     public function run()
     {
-
-        $users = array(
-            array('id' => '1','salute' => 'Mr','first_name' => 'Said','other_name' => 'Abdul','last_name' => 'Abdul','email' => 'saidabdulsalam5@gmail.com','phone_number' => '08065251757','address' => 'S.w 309 kwangila road','user_type' => 'user','password' => '','email_verified_at' => NULL,'remember_token' => NULL,'created_at' => NULL,'updated_at' => NULL),
-            array('id' => '14','salute' => 'Mr','first_name' => 'Said2','other_name' => 'Abdul','last_name' => 'Abdul','email' => 'saidabdulsalam05@gmail.com','phone_number' => '08065251752','address' => 'S.w 309 kwangila road','user_type' => 'owner','password' => '','email_verified_at' => NULL,'remember_token' => NULL,'created_at' => NULL,'updated_at' => NULL),
-            array('id' => '15','salute' => 'Mr','first_name' => 'Said4','other_name' => 'Abdul','last_name' => 'Abdul','email' => 'saidabdulsalam5@gmail.com','phone_number' => '08096642065','address' => 'S.w 309 kwangila road','user_type' => 'customer','password' => '','email_verified_at' => NULL,'remember_token' => NULL,'created_at' => NULL,'updated_at' => NULL),
-            array('id' => '16','salute' => 'Mr','first_name' => 'Said3','other_name' => 'Abdul','last_name' => 'Abdul','email' => 'zendmail05@gmail.com','phone_number' => '08065251758','address' => 'S.w 309 kwangila road','user_type' => 'owner','password' => '','email_verified_at' => NULL,'remember_token' => NULL,'created_at' => NULL,'updated_at' => NULL)
-          );
-
-          User::insert($users);
+        /* `ussd`.`products` */
+        $products = array(
+            array('id' => '1','name' => 'Malt','price' => '4200.00','user_id' => '15','description' => NULL,'quantity' => '1','active' => '1','created_at' => '2023-05-16 05:19:26','updated_at' => '2023-05-16 05:19:31'),
+            array('id' => '2','name' => 'Fanta','price' => '4000.00','user_id' => '15','description' => NULL,'quantity' => '1','active' => '1','created_at' => '2023-05-16 05:19:26','updated_at' => '2023-05-16 05:19:31'),
+            array('id' => '3','name' => 'CocaCola','price' => '4000.00','user_id' => '15','description' => NULL,'quantity' => '1','active' => '1','created_at' => '2023-05-16 05:19:26','updated_at' => '2023-05-16 05:19:31')
+        );
+        Product::insert($products);
     }
 }
